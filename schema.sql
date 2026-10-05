@@ -62,8 +62,8 @@ INSERT INTO categories (category_id, name) VALUES
 (3, 'Goggles');
 
 INSERT INTO users (username, password_hash, full_name, role) VALUES 
-('admin', 'adminpassword', 'Store Manager', 'ADMIN'),
-('seller', 'password', 'Miley Worker', 'SELLER');
+('admin', '$sha256$swim_salt_123$ff3a7828e8be8c2d400cbe5a8075155d9a310743864d04f9cd4694f6ad8601d7', 'Store Manager', 'ADMIN'),
+('seller', '$sha256$swim_salt_123$b2328d8c71eec206c4c600b58b224dd5c092c30b37853b86e43c451c4772dc6d', 'Miley Worker', 'SELLER');
 
 INSERT INTO products (category_id, name, brand, price, cost_price, stock_quantity, min_stock_level, size) VALUES
 (1, 'Arena Mens Low Waist Trunks', 'Arena', 39.99, 15.00, 10, 3, 'Large'),
@@ -72,5 +72,7 @@ INSERT INTO products (category_id, name, brand, price, cost_price, stock_quantit
 (2, 'Arena Classic Silicone Cap', 'Arena', 16.99, 7.99, 20, 5, 'Medium'),
 (1, 'Jaked Mens Briefs', 'Jaked', 26.99, 10.00, 15, 5, 'Small'),
 (3, 'Tyr Black Google', 'TYR', 65.99, 35.00, 10, 3, 'NA');
+
+
 
 SET FOREIGN_KEY_CHECKS = 1;
