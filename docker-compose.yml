@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:8.0.46
+    container_name: SwimShop
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  mysql_data:
