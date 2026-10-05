@@ -1,11 +1,33 @@
-#Environments
-.env
-.venv
-env/
+#Environments & Virtual Environments
+.venv/
 venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.env
+*.env
 
 #Database
 *.db
 *.log
+docker-data/
+
+#Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
 
 
