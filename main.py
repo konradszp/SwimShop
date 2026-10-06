@@ -1,23 +1,15 @@
 from repositories import ProductRepository
 from gui.views.login import LoginWindow
+from gui.views.main_win import MainWindow
+
+
 
 def main():
-    '''
-    print("SwimShop POS system is starting...")
+    def on_successful_login(user):
+        point_of_sale = MainWindow(current_user=user, on_logout=main)
+        point_of_sale.mainloop()
 
-    product_rep = ProductRepository()
-    products = product_rep.get_all()
-
-    print(f"\n--- Product Inventory ({len(products)} items found) ---")
-    for p in products:
-        status = "OUT OF STOCK" if p.out_of_stock else ("LOW STOCK" if p.low_stock else "OK")
-        print(f"[{status}] {p.name} ({p.brand}) - ${p.price:.2f} | Stock: {p.stock_quantity}")
-    '''
-
-def on_successful_login(user):
-    print(f"Logged in user: {user.username} - Role: {user.role}")
-
-def main():
+        
     app = LoginWindow(on_login_success=on_successful_login)
     app.mainloop()
 
