@@ -12,10 +12,10 @@ class LoginWindow(tk.Tk):
         self.user_repo = UserRepository()
         self.on_login_success = on_login_success
 
-        self._create_widgets()
-        self._center_window()
+        self.__create_widgets()
+        self.__center_window()
 
-    def _center_window(self):
+    def __center_window(self):
         self.update_idletasks()
         width = self.winfo_width()
         height = self.winfo_height()
@@ -23,7 +23,7 @@ class LoginWindow(tk.Tk):
         y = (self.winfo_screenheight() // 2) - (height // 2)
         self.geometry(f"{width}x{height}+{x}+{y}")
 
-    def _create_widgets(self):
+    def __create_widgets(self):
         card = tk.Frame(self, bg="#FFFFFF", padx=40, pady=45)
         card.place(relx=0.5, rely=0.5, anchor="center", width=420)
 
