@@ -3,8 +3,12 @@ from tkinter import ttk, messagebox
 from models.user import User
 from models.category import Category
 from models.product import Product
+from models.order import Order, OrderItem, OrderStatus
 from repositories.category import CategoryRepository
 from repositories.product import ProductRepository
+from repositories.order import OrderRepository
+
+from datetime import datetime
 
 class CartItem:
     def __init__(self, product: Product):
@@ -56,6 +60,7 @@ class MainWindow(tk.Tk):
         self.on_logout = on_logout
         self.category_repository = CategoryRepository()
         self.product_repository = ProductRepository()
+        self.order_repository = OrderRepository()
         self.cart = Cart()
 
         self.selected_category_id: int | None = None
@@ -373,14 +378,44 @@ class MainWindow(tk.Tk):
             return
 
         total = self.cart.total_amount
-        if messagebox.askyesno("Confirm Transaction", f"Complete transaction for ${total:.2f}?"):
-            for item in self.cart.items.values():
-                self.product_repository.update_stock(item.product.product_id, -item.quantity)
+        confirm =  messagebox.askyesno("Confirm Transaction", f"Complete transaction for ${total:.2f}?")
 
+        if not confirm:
+            return
+
+        order_items = []
+
+        for cart_item in self.cart.items.values():
+            order_items.append(
+                OrderItem(
+                    product_id=cart_item.product.product_id,
+                    quantity=cart_item.quantity,
+                    unit_price=cart_item.product.price
+                )
+            )
+
+
+        new_order = Order(
+            customer_id=1,
+            user_id=self.current_user.user_id,
+            order_datetime=datetime.now(),
+            total_amount=self.cart.total_amount,
+            status=OrderStatus.PENDING,
+            items=order_items
+        )
+
+        order_id = self.order_repository.create_order(new_order)
+
+        if order_id:
             messagebox.showinfo("Success", f"Transaction completed!\nTotal paid: ${total:.2f}")
             self.cart.clear()
             self._render_cart()
             self._render_products()
+        else:
+            messagebox.showerror(
+                "Database Error", 
+                "Failed to record the transaction in the database. Please try again."
+            )
 
     """ Resize products depending on the window dimentions """
     def _on_products_resize(self, event):
