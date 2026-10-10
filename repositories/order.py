@@ -2,6 +2,7 @@ from database import get_connection
 from models.order import Order, OrderItem, OrderStatus
 
 class OrderRepository:
+
     def create_order(self, order: Order) -> int | None:
         conn = get_connection()
         if not conn:
@@ -76,3 +77,43 @@ class OrderRepository:
             if conn and conn.is_connected():
                 cursor.close()
                 conn.close()
+
+    def get_all(self) -> list[Order]:
+        conn = get_connection()
+        if not conn:
+            return []
+
+        cursor = conn.cursor(dictionary=True)
+
+        try:
+            cursor.execute("SELECT * FROM orders ORDER BY order_datetime DESC")
+            orders_data = cursor.fetchall()
+
+            orders = []
+            for order in orders_data:
+                orders.append(
+                    Order(
+                        order_id=order["order_id"],
+                        customer_id=order["customer_id"],
+                        user_id=order["user_id"],
+                        order_datetime=order["order_datetime"],
+                        total_amount=float(order["total_amount"]),
+                        status=OrderStatus(order["status"]),
+                        items=[]
+                    )
+                )
+            return orders
+        finally:
+            try:
+                if cursor:
+                    cursor.close()
+            except Exception:
+                pass
+                
+            try:
+                if conn:
+                    conn.close()
+            except Exception:
+                pass
+
+

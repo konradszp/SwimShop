@@ -1,7 +1,7 @@
 DB_CONFIG = {
     "host": "localhost",
-    "port": 3307,
-    "database": "database",
+    "port": 3306,
+    "database": "SwimShop",
     "user": "user",
     "password": "password"
 }
