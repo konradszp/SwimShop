@@ -228,6 +228,99 @@ class MainWindow(tk.Tk):
         self._render_products()
         self._render_cart()
 
+    """ Inventory View """
+    def _build_inventory(self):
+        inventory_container = tk.Frame(self.inventory_tab, bg="#F8FAFC", padx=10, pady=10)
+        inventory_container.pack(fill="both", expand=True)
+
+        top_bar = tk.Frame(inventory_container, bg="#F8FAFC")
+        top_bar.pack(fill="x", pady=(0,10))
+
+        refresh_button = tk.Button(
+            top_bar, text="🔄 Refresh Inventory", font=("Segoe UI", 9, "bold"),
+            bg="#0284C7", fg="white", activebackground="#0369A1", activeforeground="white",
+            relief="flat", cursor="hand2", command=self._render_inventory
+        )
+        refresh_button.pack(side="left", ipady=4, ipadx=10)
+
+        table_frame = tk.Frame(inventory_container, bg="#FFFFFF", highlightthickness=1, highlightbackground="#E2E8F0")
+        table_frame.pack(fill="both", expand=True)
+
+        """ Inventory Table Style """
+        style = ttk.Style()
+        style.theme_use("default")
+
+        style.configure(
+            "Inventory.Treeview",
+            background="#FFFFFF",
+            foreground="#1E293B",
+            fieldbackground="#FFFFFF",
+            rowheight=32,
+            font=("Segoe UI", 10),
+            borderwidth=0
+        )
+        style.configure(
+            "Inventory.Treeview.Heading",
+            background="#0F172A",
+            foreground="#F8FAFC",
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
+            padding=(8, 6)
+        )
+        style.map(
+            "Inventory.Treeview",
+            background=[("selected", "#0284C7")],
+            foreground=[("selected", "#FFFFFF")]
+        )
+        style.map(
+            "Inventory.Treeview.Heading",
+            background=[("active", "#1E293B")]
+        )
+
+        columns = ("product_id", "category_id", "name", "brand", "price", "cost_price", 
+                   "stock_quantity", "min_stock_level", "size", "description"
+        )
+        self.inventory_tree = ttk.Treeview(
+            table_frame,
+            columns=columns,
+            show="headings",
+            selectmode="browse",
+            style="Orders.Treeview"
+        )
+
+        self.inventory_tree.heading("product_id", text="Product ID")
+        self.inventory_tree.heading("category_id", text="Category ID")
+        self.inventory_tree.heading("name", text="Name")
+        self.inventory_tree.heading("brand", text="Brand")
+        self.inventory_tree.heading("price", text="Price")
+        self.inventory_tree.heading("cost_price", text="Cost Price")
+        self.inventory_tree.heading("stock_quantity", text="Qty")
+        self.inventory_tree.heading("min_stock_level", text="Min Qty")
+        self.inventory_tree.heading("size", text="Size")
+        self.inventory_tree.heading("description", text="Product Description")
+
+        self.inventory_tree.column("product_id", width=90, anchor="center")
+        self.inventory_tree.column("category_id", width=90, anchor="center")
+        self.inventory_tree.column("name", width=200, anchor="center")
+        self.inventory_tree.column("brand", width=120, anchor="center")
+        self.inventory_tree.column("price", width=120, anchor="e")
+        self.inventory_tree.column("cost_price", width=120, anchor="e")
+        self.inventory_tree.column("stock_quantity", width=90, anchor="e")
+        self.inventory_tree.column("min_stock_level", width=90, anchor="e")
+        self.inventory_tree.column("size", width=90, anchor="center")
+        self.inventory_tree.column("description", width=300, anchor="w")
+
+        self.inventory_tree.tag_configure("odd", background="#F8FAFC")
+        self.inventory_tree.tag_configure("even", background="#FFFFFF")
+        self.inventory_tree.tag_configure("low_stock", background="#ffcccc", foreground="#990000")
+
+        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.inventory_tree.yview)
+        self.inventory_tree.configure(yscrollcommand=scrollbar.set)
+        self.inventory_tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        self._render_inventory()
+
 
     """ Orders View """
     def _build_orders(self):
@@ -376,6 +469,41 @@ class MainWindow(tk.Tk):
                 command=lambda cid=category.category_id: self._select_category(cid)
             )
             btn.pack(fill="x", pady=2)
+
+
+    """ Fetches Products from the database """
+    def _render_inventory(self):
+        for item in self.inventory_tree.get_children():
+            self.inventory_tree.delete(item)
+
+        products = self.product_repository.get_all()
+        for index, product in enumerate(products):
+            stock = product.stock_quantity
+            min_stock = product.min_stock_level
+
+            is_low_stock = stock <= min_stock
+
+            row_tag = "even" if index % 2 == 0 else "odd"
+
+            if is_low_stock:
+                row_tags = ("low_stock",)
+            else:
+                row_tags = ()
+
+            self.inventory_tree.insert("", "end", values=(
+                product.product_id,
+                product.category_id,
+                product.name,
+                product.brand,
+                product.price,
+                product.cost_price,
+                stock,
+                min_stock,
+                product.size,
+                product.description
+            ),
+            tags=(row_tag,row_tags)
+            )
 
     """ Displays chosen category products """
     def _select_category(self, category_id: int | None):
@@ -552,26 +680,6 @@ class MainWindow(tk.Tk):
             self.products_container.unbind("<Configure>")
             self._render_products()
             self.products_container.bind("<Configure>", self._on_products_resize)
-
-    """ Placeholder for inventory view """
-    def _build_inventory(self):
-        admin_lbl = tk.Label(
-            self.inventory_tab,
-            text="Inventory Management",
-            font=("Segoe UI", 16, "bold"),
-            bg="#FFFFFF",
-            fg="#0F172A"
-        )
-        admin_lbl.pack(anchor="w", pady=(0, 10))
-
-        desc_lbl = tk.Label(
-            self.inventory_tab,
-            text="Inventory Manager (todo)",
-            font=("Segoe UI", 11),
-            bg="#FFFFFF",
-            fg="#64748B"
-        )
-        desc_lbl.pack(anchor="w")
 
     """ Session management """
     def _handle_logout(self):
