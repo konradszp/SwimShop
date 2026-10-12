@@ -4,6 +4,7 @@ from dataclasses import dataclass
 class Product:
     product_id: int | None
     category_id: int
+    category_name: str
     name: str
     brand: str
     price: float

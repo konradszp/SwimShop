@@ -289,7 +289,7 @@ class MainWindow(tk.Tk):
         )
 
         self.inventory_tree.heading("product_id", text="Product ID")
-        self.inventory_tree.heading("category_id", text="Category ID")
+        self.inventory_tree.heading("category_id", text="Category")
         self.inventory_tree.heading("name", text="Name")
         self.inventory_tree.heading("brand", text="Brand")
         self.inventory_tree.heading("price", text="Price")
@@ -492,7 +492,7 @@ class MainWindow(tk.Tk):
 
             self.inventory_tree.insert("", "end", values=(
                 product.product_id,
-                product.category_id,
+                product.category_name,
                 product.name,
                 product.brand,
                 product.price,

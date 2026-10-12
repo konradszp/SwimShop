@@ -4,7 +4,12 @@ from models.product import Product
 
 class ProductRepository(BaseRepository):
     def get_all(self) -> List[Product]:
-        query = "SELECT * FROM products ORDER BY name ASC"
+        query = """
+            SELECT product.*, category.name AS category_name
+            FROM products product
+            LEFT JOIN categories category ON product.category_id = category.category_id
+            ORDER BY product.name ASC
+        """
         rows = self.execute_query(query)
         products = []
         
@@ -13,6 +18,7 @@ class ProductRepository(BaseRepository):
                 Product(
                     product_id=row['product_id'],
                     category_id=row['category_id'],
+                    category_name=row.get('category_name'),
                     name=row['name'],
                     brand=row['brand'],
                     price=row['price'],
@@ -35,6 +41,7 @@ class ProductRepository(BaseRepository):
                 Product(
                     product_id=row['product_id'],
                     category_id=row['category_id'],
+                    category_name=row.get('category_name'),
                     name=row['name'],
                     brand=row['brand'],
                     price=float(row['price']),
@@ -58,6 +65,7 @@ class ProductRepository(BaseRepository):
                 Product(
                     product_id=row['product_id'],
                     category_id=row['category_id'],
+                    category_name=row.get('category_name'),
                     name=row['name'],
                     brand=row['brand'],
                     price=float(row['price']),
