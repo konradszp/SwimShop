@@ -86,7 +86,11 @@ class OrderRepository:
         cursor = conn.cursor(dictionary=True)
 
         try:
-            cursor.execute("SELECT * FROM orders ORDER BY order_datetime DESC")
+            cursor.execute("""
+                SELECT `order`.*, customer.full_name  AS customer_full_name
+                FROM orders `order`
+                LEFT JOIN customers customer ON `order`.customer_id = customer.customer_id
+            """)
             orders_data = cursor.fetchall()
 
             orders = []
@@ -95,6 +99,7 @@ class OrderRepository:
                     Order(
                         order_id=order["order_id"],
                         customer_id=order["customer_id"],
+                        customer_name=order.get('customer_full_name'),
                         user_id=order["user_id"],
                         order_datetime=order["order_datetime"],
                         total_amount=float(order["total_amount"]),

@@ -383,7 +383,7 @@ class MainWindow(tk.Tk):
 
         self.orders_tree.heading("order_id", text="Order ID")
         self.orders_tree.heading("date", text="Date & Time")
-        self.orders_tree.heading("customer_id", text="Customer ID")
+        self.orders_tree.heading("customer_id", text="Customer Name")
         self.orders_tree.heading("user_id", text="Cashier ID")
         self.orders_tree.heading("total", text="Total Amount")
         self.orders_tree.heading("status", text="Status")
@@ -431,7 +431,7 @@ class MainWindow(tk.Tk):
                 values=(
                     order.order_id,
                     order.order_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-                    order.customer_id,
+                    order.customer_name,
                     order.user_id,
                     f"${order.total_amount:.2f}",
                     order.status.value.capitalize()

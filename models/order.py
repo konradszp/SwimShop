@@ -22,6 +22,7 @@ class OrderItem:
 @dataclass
 class Order:
     customer_id: int
+    customer_name: str | None
     user_id: int
     order_datetime: datetime
     total_amount: float
