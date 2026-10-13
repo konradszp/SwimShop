@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 from models.user import User
 from models.category import Category
 from models.product import Product
@@ -9,6 +9,7 @@ from repositories.product import ProductRepository
 from repositories.order import OrderRepository
 
 from datetime import datetime
+import csv
 
 class CartItem:
     def __init__(self, product: Product):
@@ -91,7 +92,7 @@ class MainWindow(tk.Tk):
 
         brand_label = tk.Label(
             navbar,
-            text="SwimShop POS",
+            text="SwimShop",
             font=("Segoe UI", 14, "bold"),
             bg="#0F172A",
             fg="#F8FAFC"
@@ -241,7 +242,14 @@ class MainWindow(tk.Tk):
             bg="#0284C7", fg="white", activebackground="#0369A1", activeforeground="white",
             relief="flat", cursor="hand2", command=self._render_inventory
         )
-        refresh_button.pack(side="left", ipady=4, ipadx=10)
+        refresh_button.pack(side="left", ipady=4, ipadx=10, padx=(0, 10))
+
+        self.import_btn = tk.Button(
+            top_bar, text="📁 Import Delivery CSV", font=("Segoe UI", 9, "bold"),
+            bg="#0284C7", fg="white", activebackground="#0369A1", activeforeground="white",
+            relief="flat", cursor="hand2", command=self._handle_csv_import
+        )
+        self.import_btn.pack(side="left", ipady=4, ipadx=10, padx=(10, 10))
 
         table_frame = tk.Frame(inventory_container, bg="#FFFFFF", highlightthickness=1, highlightbackground="#E2E8F0")
         table_frame.pack(fill="both", expand=True)
@@ -688,6 +696,39 @@ class MainWindow(tk.Tk):
             self.destroy()
             if self.on_logout:
                 self.on_logout()
+
+    
+    """ Handles delivery report and updates stock """
+    """ So far CSV files only """
+    def _handle_csv_import(self):
+        """ Open a window to select the CSV file """
+        file_path = filedialog.askopenfilename(
+            title="Select Delivery CSV",
+            filetypes=[("CSV Files", "*.csv"), ("All Files", "*.*")]
+        )
+        
+        if not file_path:
+            return
+
+        try:
+            with open(file_path, mode='r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                count = 0
+                for row in reader:
+                    product_id = int(row['product_id'])
+                    quantity = int(row['quantity'])
+                    self.product_repository.update_stock(product_id, quantity_delta=quantity)
+                    count += 1
+            
+            if count == 0:
+                messagebox.showwarning("Empty File", "The selected CSV file contains no data.")
+                return
+
+            messagebox.showinfo("Success", f"Successfully imported deliveries for {count} products!")
+            self._render_inventory()
+
+        except Exception as e:
+            messagebox.showerror("Import Error", f"Failed to process CSV file:\n{str(e)}")
 
 
     
