@@ -647,6 +647,7 @@ class MainWindow(tk.Tk):
 
         new_order = Order(
             customer_id=1,
+            customer_name=None,
             user_id=self.current_user.user_id,
             order_datetime=datetime.now(),
             total_amount=self.cart.total_amount,
