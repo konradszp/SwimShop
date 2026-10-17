@@ -30,4 +30,5 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
+delivery_example.csv
 
